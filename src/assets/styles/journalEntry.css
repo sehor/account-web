@@ -1,0 +1,508 @@
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    max-height: 800px;
+    gap: 20px;
+    position: relative;
+}
+
+.left-panel {
+    width: 300px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    position: fixed;
+    left: -270px;
+    top: 0;
+    bottom: 0;
+    background-color: #ffffff;
+    transition: left 0.3s ease-in-out;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.left-panel:hover {
+    left: 0;
+}
+
+.panel-toggle {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    background-color: #00695c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    transition: background-color 0.3s;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1001;
+}
+
+.panel-toggle:hover {
+    background-color: #004d40;
+}
+
+.entries-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.entries-list li {
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.entries-list li:hover {
+    background-color: #e8e8e8;
+    transform: translateX(5px);
+}
+
+.entry-date {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.entry-description {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.entry-amount {
+    color: #00796b;
+    font-weight: bold;
+}
+
+.right-panel {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.voucher-container {
+    width: 100%;
+    max-width: 1000px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.main-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.sub-title {
+    font-size: 16px;
+    color: #666;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-item {
+    margin-right: 20px;
+}
+
+select,
+input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fafafa;
+    transition: border-color 0.3s;
+}
+
+select:focus,
+input[type="text"]:focus {
+    border-color: #00796b;
+    outline: none;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    font-size: 14px;
+    border: 1px solid #444;
+    table-layout: fixed;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+table tr {
+    height: 60px;
+}
+
+th,
+td {
+    height: 60px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    overflow: visible;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Ensure input fields take up the full width and height of the table cells */
+td input {
+    width: 100%;
+    height: 100%;
+    padding: 0; /* Adjust as needed */
+    margin: 0; /* Remove default margin */
+    border: 1px solid #ccc; /* Adjust border as needed */
+    box-sizing: border-box; /* Ensures padding and border are included in width/height */
+}
+
+/* Optionally, ensure the cells themselves don't have extra padding */
+td {
+    padding: 0;
+}
+/* If you want the input fields to have some padding internally but still fit perfectly */
+td input {
+    padding: 4px; /* Adjust padding as needed */
+}
+
+th {
+    background-color: #f0f0f0;
+    border-top: 1px solid #444;
+    font-weight: bold;
+    color: #333;
+}
+
+tr:nth-child(even) td {
+    background-color: #fafafa;
+}
+
+tr:last-child td {
+    border-bottom: 1px solid #444;
+}
+
+td:first-child,
+th:first-child {
+    border-left: 1px solid #444;
+}
+
+td:last-child,
+th:last-child {
+    border-right: 1px solid #444;
+}
+
+.green-bg {
+    background-color: #e8f5e9;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.bold-text {
+    font-weight: bold;
+}
+
+.number-cell {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.1em;
+}
+
+td:hover {
+    background-color: #e6f7ff;
+    cursor: pointer;
+}
+
+.editable {
+    width: 100%;
+    height: 100%;
+    background-color: #fffde7;
+    color: #424242;
+    outline: none;
+    box-sizing: border-box;
+    display: none;
+    padding: 5px;
+}
+/* Additional styles for better visual alignment */
+.editable {
+    padding: 5px; /* Add internal padding */
+    border: none; /* Remove border to avoid overflow */
+}
+
+.non-editable {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+.action-cell {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.action-icon {
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 16px;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 50%;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.action-icon:hover {
+    opacity: 0.7;
+    transform: scale(1.1);
+}
+
+.action-icon.add {
+    color: #388e3c;
+    border: 1px solid #388e3c;
+}
+
+.action-icon.add:hover {
+    background-color: #e8f5e9;
+}
+
+.action-icon.delete {
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+}
+
+.action-icon.delete:hover {
+    background-color: #ffebee;
+}
+
+.col-summary {
+    width: 20%;
+}
+
+.col-account {
+    width: 40%;
+}
+
+.col-debit,
+.col-credit {
+    width: 15%;
+}
+
+.col-action {
+    width: 10%;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.preparer {
+    font-size: 14px;
+    color: #666;
+}
+
+.buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-save {
+    background-color: #388e3c;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #2e7d32;
+}
+
+.btn-new {
+    background-color: #0288d1;
+    color: white;
+}
+
+.btn-new:hover {
+    background-color: #0277bd;
+}
+
+.btn-print {
+    background-color: #f57c00;
+    color: white;
+}
+
+.btn-print:hover {
+    background-color: #ef6c00;
+}
+
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.autocomplete-results {
+    position: fixed;
+    background-color: white;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: auto;
+    min-width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-btn-save {
+    background-color: #388e3c;
+    color: white;
+}
+
+.modal-btn-discard {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.modal-btn-cancel {
+    background-color: #757575;
+    color: white;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .container {
+        display: block;
+    }
+
+    .right-panel {
+        display: block;
+        width: 100%;
+    }
+
+    .voucher-container {
+        width: 100%;
+        box-shadow: none;
+    }
+
+    body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
