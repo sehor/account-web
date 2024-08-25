@@ -144,7 +144,7 @@ import SearchableSelect from './SearchableSelect.vue'
 import {Transaction, JournalEntryView} from '@/models/journalEntryModels.js'
 import {journalEntryService} from '@/services/journalEntryService';
 import {ElMessage} from 'element-plus'
-import {useAccountStore} from '@/stores/accountStores';
+import {useAccountStore} from '@/stores/accountStore';
 import {formatNumber, numberToChinese} from '@/utils.js'
 
 export default {
@@ -396,7 +396,7 @@ export default {
   padding: 2px;
 }
 
-/deep/ .custom-autocomplete .el-input {
+::v-deep(.custom-autocomplete .el-input) {
   height: 60px;
 }
 

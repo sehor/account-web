@@ -2,7 +2,7 @@
 
 import {JournalEntryModels, JournalEntryView, Transaction} from '@/models/journalEntryModels.js';
 import {journalEntryApi} from '@/http/journalEntryAPI';
-import {useAccountStore} from '@/stores/accountStores';
+import {useAccountStore} from '@/stores/accountStore';
 import {ElMessage} from 'element-plus';
 import accountService from '@/services/accountService'
 

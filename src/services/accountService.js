@@ -1,5 +1,5 @@
 import accountAPI from '@/http/accountAPI.js';
-import { useAccountStore } from '@/stores/accountStores';
+import { useAccountStore } from '@/stores/accountStore';
 
 
 

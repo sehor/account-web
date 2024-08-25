@@ -106,7 +106,7 @@
 
 <script>
 
-import {useAccountStore} from '@/stores/accountStores';
+import {useAccountStore} from '@/stores/accountStore';
 import accountService from '@/services/accountService';
 import {ElMessage} from 'element-plus'; // 引入 Element Plus 的 Message 组件
 import {Account, AccountCategoryMapping, ChineseToEnglishMapping} from "@/models/accountModels.js";

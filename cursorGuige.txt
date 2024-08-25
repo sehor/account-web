@@ -1,0 +1,48 @@
+In Cursor, the `@XXX` features are special commands you can use in the chatbot interface to enhance your coding experience. These commands allow you to interact with the AI more effectively, access documentation, search the web, and manage your code. Here are some of the key `@XXX` features you can use in the Cursor chatbot:
+
+### 1. **@web**
+   - **Purpose:** To perform web searches directly from within the Cursor interface.
+   - **Usage:** If you need to look up information or get additional resources, you can type `@web` followed by your query. Cursor will search the web and provide you with relevant results.
+   - **Example:** `@web find documentation for React Router` – This will search the web for React Router documentation, which you can then use to guide your coding.
+
+### 2. **@docs**
+   - **Purpose:** To access official documentation for popular libraries, frameworks, and APIs.
+   - **Usage:** Type `@docs` followed by the name of the library or framework you want documentation for. Cursor will pull in the relevant documentation, allowing you to refer to it directly in your code.
+   - **Example:** `@docs OpenAI API` – This will bring up the official OpenAI API documentation so you can integrate it into your project.
+
+### 3. **@context**
+   - **Purpose:** To manage and tag files that the AI should consider as context for generating or modifying code.
+   - **Usage:** Use `@context` to specify which files should be included as context for the AI when making changes. This ensures that the AI considers only the relevant files, improving the accuracy of the generated code.
+   - **Example:** `@context add server.js` – This tells Cursor to include `server.js` as part of the context when making changes to the backend code.
+
+### 4. **@code**
+   - **Purpose:** To generate, refactor, or modify code snippets based on your instructions.
+   - **Usage:** When you need Cursor to generate specific code, you can type `@code` followed by a description of what you need. This command is especially useful for creating new functions, components, or even entire files.
+   - **Example:** `@code create a React component for a login form` – Cursor will generate a React component for a login form based on your description.
+
+### 5. **@fix**
+   - **Purpose:** To debug and fix issues in your code.
+   - **Usage:** If you encounter a bug or issue, you can use `@fix` followed by a description of the problem. Cursor will attempt to diagnose and fix the issue in the relevant part of the code.
+   - **Example:** `@fix the button click event is not triggering` – Cursor will analyze the issue and suggest or apply a fix to the code.
+
+### 6. **@explain**
+   - **Purpose:** To get explanations for code snippets or concepts.
+   - **Usage:** Use `@explain` if you want Cursor to explain what a particular piece of code does or to clarify a coding concept.
+   - **Example:** `@explain what does this JavaScript function do?` – Paste the function after the command, and Cursor will provide an explanation.
+
+### 7. **@test**
+   - **Purpose:** To generate or run tests for your code.
+   - **Usage:** When you want to ensure your code is functioning correctly, you can use `@test` to generate test cases or to run existing tests.
+   - **Example:** `@test create unit tests for the login form component` – Cursor will generate unit tests for the specified component.
+
+### 8. **@review**
+   - **Purpose:** To get a code review or quality assessment.
+   - **Usage:** If you want feedback on your code’s quality, structure, or potential issues, use `@review` to have Cursor analyze and suggest improvements.
+   - **Example:** `@review the authentication logic in server.js` – Cursor will review the authentication logic and suggest any improvements or highlight potential issues.
+
+### 9. **@generate**
+   - **Purpose:** To auto-generate code based on high-level descriptions or templates.
+   - **Usage:** Use `@generate` when you want Cursor to create code from scratch based on a general idea or requirement.
+   - **Example:** `@generate a Node.js Express server with routes for user authentication` – Cursor will generate the necessary code for a Node.js Express server with authentication routes.
+
+These `@XXX` features make it easier to interact with Cursor and enhance your productivity by providing quick access to information, generating code, debugging, and managing your coding environment efficiently.

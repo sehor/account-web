@@ -4,27 +4,38 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="app-container">
+    <header>
+      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
-    <div class="wrapper">
-      <HelloWorld msg="Welcome to account system." />
+      <div class="wrapper">
+        <HelloWorld msg="Welcome to account system." />
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/account">科目管理</RouterLink>
-        <RouterLink to="/journalEntry">凭证输入</RouterLink>
-      </nav>
-    </div>
-  </header>
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/account">科目管理</RouterLink>
+          <RouterLink to="/journalEntry">凭证输入</RouterLink>
+          <RouterLink to="/ledger">会计分类账</RouterLink>
+          <RouterLink to="/accounts">会计科目表</RouterLink>
+          <RouterLink to="/ledgers">明细账</RouterLink>
+        </nav>
+      </div>
+    </header>
 
-  <RouterView />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 header {
   line-height: 1.5;
-  max-height: 100vh;
+  max-height: none;
 }
 
 .logo {
@@ -59,9 +70,7 @@ nav a:first-of-type {
 
 @media (min-width: 1024px) {
   header {
-    display: block;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+    width: 100%;
   }
 
   .logo {

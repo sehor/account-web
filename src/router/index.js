@@ -16,14 +16,36 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AccountManage.vue')
-    },    {
+    }, 
+
+      {
       path: '/journalEntry',
       name: 'journalEntry',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../components/JournalEntry.vue')
-    }
+    },
+    // 会计分类账
+    {
+      path: '/ledger',
+      name: 'ledger',
+      component: () => import('../components/Ledger.vue')
+    },
+    {
+      path: '/accounts',
+      name: 'accounts',
+      component: () => import('../components/Accounts.vue')
+    },
+    {
+      path: '/ledgers',
+      name: 'ledgers',
+      component: () => import('../components/Ledgers.vue')
+    },
+    //ledgers
+
+
+
   ]
 })
 
