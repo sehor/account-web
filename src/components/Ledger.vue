@@ -1,55 +1,60 @@
 <template>
   <div class="ledger" v-loading="loading">
-    <div class="ledger-header">
-      <div class="spacer"></div>
-      <button @click="exportToExcel" class="export-button">导出到Excel</button>
+    <div v-if="isValidAccount">
+      <div class="ledger-header">
+        <div class="spacer"></div>
+        <button @click="exportToExcel" class="export-button">导出到Excel</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>凭证字号</th>
+            <th>描述</th>
+            <th>借方</th>
+            <th>贷方</th>
+            <th>方向</th>
+            <th>余额</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(group, period) in paginatedEntries">
+            <tr v-for="(entry, index) in group" :key="`${period}-${index}`" :class="{ 'stripe': index % 2 === 0 }">
+              <td>{{ entry.date }}</td>
+              <td>{{ entry.voucherNo }}</td>
+              <td>{{ entry.description }}</td>
+              <td>{{ formatAmount(entry.debit) }}</td>
+              <td>{{ formatAmount(entry.credit) }}</td>
+              <td>{{ account.balanceDirection === 'DEBIT' ? '借' : '贷' }}</td>
+              <td>{{ formatNumber(entry.balance) }}</td>
+            </tr>
+            <tr class="period-summary">
+              <td colspan="3">{{ period }} 合计</td>
+              <td>{{ formatAmount(periodTotals[period].debit) }}</td>
+              <td>{{ formatAmount(periodTotals[period].credit) }}</td>
+              <td>{{ periodTotals[period].balanceDirection }}</td>
+              <td>{{ formatNumber(periodTotals[period].balance) }}</td>
+            </tr>
+          </template>
+        </tbody>
+        <tfoot v-if="ledgerEntries.length > 0">
+          <tr class="grand-total">
+            <td colspan="3">总计</td>
+            <td>{{ formatAmount(grandTotal.debit) }}</td>
+            <td>{{ formatAmount(grandTotal.credit) }}</td>
+            <td>{{ grandTotal.balanceDirection }}</td>
+            <td>{{ formatNumber(grandTotal.balance) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="pagination" v-if="ledgerEntries.length > 0">
+        <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
+        <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>日期</th>
-          <th>凭证字号</th>
-          <th>描述</th>
-          <th>借方</th>
-          <th>贷方</th>
-          <th>方向</th>
-          <th>余额</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="(group, period) in paginatedEntries">
-          <tr v-for="(entry, index) in group" :key="`${period}-${index}`" :class="{ 'stripe': index % 2 === 0 }">
-            <td>{{ entry.date }}</td>
-            <td>{{ entry.voucherNo }}</td>
-            <td>{{ entry.description }}</td>
-            <td>{{ formatAmount(entry.debit) }}</td>
-            <td>{{ formatAmount(entry.credit) }}</td>
-            <td>{{ entry.direction }}</td>
-            <td>{{ formatBalance(entry.balance) }}</td>
-          </tr>
-          <tr class="period-summary">
-            <td colspan="3">{{ period }} 合计</td>
-            <td>{{ formatAmount(periodTotals[period].debit) }}</td>
-            <td>{{ formatAmount(periodTotals[period].credit) }}</td>
-            <td>{{ periodTotals[period].direction }}</td>
-            <td>{{ formatBalance(periodTotals[period].balance) }}</td>
-          </tr>
-        </template>
-      </tbody>
-      <tfoot v-if="ledgerEntries.length > 0">
-        <tr class="grand-total">
-          <td colspan="3">总计</td>
-          <td>{{ formatAmount(grandTotal.debit) }}</td>
-          <td>{{ formatAmount(grandTotal.credit) }}</td>
-          <td>{{ grandTotal.direction }}</td>
-          <td>{{ formatBalance(grandTotal.balance) }}</td>
-        </tr>
-      </tfoot>
-    </table>
-    <div class="pagination" v-if="ledgerEntries.length > 0">
-      <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
-      <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+    <div v-else class="no-account-selected">
+      请选择一个账户
     </div>
   </div>
 </template>
@@ -59,21 +64,25 @@ import { ref, computed, watch } from 'vue';
 import * as XLSX from 'xlsx';
 import transactionAPI from '../http/transactionAPI'
 import { ElMessage } from 'element-plus'
+import { Account } from '@/models/accountModels.js'; // 确保导入 Account 类
 
 export default {
   name: 'Ledger',
   props: {
     account: {
       type: Object,
-      required: true
+      required: true,
+      default: () => new Account() // 提供一个默认的 Account 实例
     },
     startDate: {
       type: String,
-      required: true
+      required: true,
+      default: ''
     },
     endDate: {
       type: String,
-      required: true
+      required: true,
+      default: ''
     },
     shouldFetch: {
       type: Boolean,
@@ -86,16 +95,24 @@ export default {
     const currentPage = ref(1);
     const itemsPerPage = ref(10);
 
+    const isValidAccount = computed(() => props.account && props.account.id);
+
     const fetchLedgerEntries = async () => {
-      if (!props.account || !props.startDate || !props.endDate) return;
+      if (!isValidAccount.value || !props.startDate || !props.endDate) {
+        console.log('Invalid account or date range');
+        return;
+      }
 
       loading.value = true;
+      ledgerEntries.value = []; // Reset ledgerEntries
       try {
+        console.log('Fetching ledger entries:', props.account.balanceDirection, props.startDate, props.endDate);
         const response = await transactionAPI.getTransactionsByAccountAndPeriod(
           props.account.id,
           props.startDate,
           props.endDate
         );
+        console.log('API response:', response);
         const returnData = response?._embedded?.transactionList;
         if (returnData) {
           ledgerEntries.value = returnData;
@@ -119,9 +136,9 @@ export default {
 
     watch(() => props.shouldFetch, (newShouldFetch) => {
       if (newShouldFetch) {
-        fetchLedgerEntries();
+        fetchLedgerEntries()
       }
-    });
+    }, { immediate: true })
 
     const filteredEntries = computed(() => {
       return ledgerEntries.value.filter(entry => {
@@ -132,6 +149,8 @@ export default {
     });
 
     const groupedEntries = computed(() => {
+      if (!isValidAccount.value) return {};
+
       let runningBalance = 0;
       return filteredEntries.value.reduce((acc, entry) => {
         const period = entry.createdDate.substring(0, 7);
@@ -140,16 +159,15 @@ export default {
         }
         const debit = Number(entry.debit) || 0;
         const credit = Number(entry.credit) || 0;
-        if (entry.balanceDirection === 'DEBIT') {
+        if (props.account.balanceDirection === 'DEBIT') {
           runningBalance += debit - credit;
         } else {
-          runningBalance -= debit - credit;
+          runningBalance += credit - debit;
         }
         acc[period].push({
           ...entry,
           date: entry.createdDate,
           voucherNo: entry.vouchWord || '-',
-          direction: entry.balanceDirection === 'DEBIT' ? '借' : '贷',
           balance: runningBalance
         });
         return acc;
@@ -173,9 +191,9 @@ export default {
           total.debit += entry.debit;
           total.credit += entry.credit;
           total.balance = entry.balance;
-          total.direction = entry.direction;
+          total.balanceDirection = props.account.balanceDirection === 'DEBIT' ? '借' : '贷';
           return total;
-        }, {debit: 0, credit: 0, balance: 0, direction: ''});
+        }, {debit: 0, credit: 0, balance: 0, balanceDirection: ''});
         return acc;
       }, {});
     });
@@ -185,9 +203,9 @@ export default {
         total.debit += periodTotal.debit;
         total.credit += periodTotal.credit;
         total.balance = periodTotal.balance;
-        total.direction = periodTotal.direction;
+        total.balanceDirection = props.account.balanceDirection === 'DEBIT' ? '借' : '贷';
         return total;
-      }, {debit: 0, credit: 0, balance: 0, direction: ''});
+      }, {debit: 0, credit: 0, balance: 0, balanceDirection: ''});
     });
 
     function formatNumber(value) {
@@ -196,11 +214,6 @@ export default {
 
     function formatAmount(value) {
       return value === 0 ? '' : formatNumber(value);
-    }
-
-    function formatBalance(value) {
-      if (value === 0) return '平';
-      return `${value > 0 ? '借' : '贷'} ${formatNumber(Math.abs(value))}`;
     }
 
     function prevPage() {
@@ -226,8 +239,8 @@ export default {
         描述: entry.description,
         借方: entry.debit,
         贷方: entry.credit,
-        方向: entry.direction,
-        余额: entry.balance
+        方向: props.account.balanceDirection === 'DEBIT' ? '借' : '贷',
+        余额: Math.abs(entry.balance)
       }));
 
       const ws = XLSX.utils.json_to_sheet(data);
@@ -235,6 +248,15 @@ export default {
       XLSX.utils.book_append_sheet(wb, ws, "会计分类账");
       XLSX.writeFile(wb, `${props.account.code}-${props.account.name}-明细账.xlsx`);
     }
+
+    // 添加这个 watch 函数来监视 account prop
+    watch(() => props.account, (newAccount) => {
+      console.log('Current account:', newAccount);
+      console.log('Account ID:', newAccount.id);
+      console.log('Account Code:', newAccount.code);
+      console.log('Account Name:', newAccount.name);
+      console.log('Account Balance Direction:', newAccount.balanceDirection);
+    }, { immediate: true, deep: true });
 
     return {
       loading,
@@ -245,10 +267,11 @@ export default {
       periodTotals,
       grandTotal,
       formatAmount,
-      formatBalance,
+      formatNumber,
       prevPage,
       nextPage,
-      exportToExcel
+      exportToExcel,
+      isValidAccount
     };
   }
 }

@@ -107,13 +107,6 @@ class JournalEntryService {
                 transaction.account = { id: transactionData.accountId, fullName: 'Unknown Account' };
             }
 
-            // Set debit or credit
-            if (transaction.balanceDirection.toLowerCase() === 'debit') {
-                transaction.debit = transaction.amount;
-            } else {
-                transaction.credit = transaction.amount;
-            }
-
             return transaction;
         });
 

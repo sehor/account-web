@@ -34,7 +34,7 @@
                   :value="period.value"
                 />
               </el-select>
-              <el-button type="primary" @click="shouldFetch = true" >获取</el-button>
+              <el-button type="primary" @click="fetchData" >获取</el-button>
             </div>
           </div>
           <Ledger
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import Accounts from './Accounts.vue'
 import Ledger from './Ledger.vue'
 import { useAccountStore } from '../stores/accountStore'
@@ -93,14 +93,15 @@ export default {
 
     function handleAccountSelect(account) {
       selectedAccount.value = account
-      if (canFetch.value) {
-        shouldFetch.value = true // 当选择新账户时，如果可以获取数据，则触发数据获取
-      }
+      fetchData() // 每次选择账户时都获取数据
     }
 
     function fetchData() {
       if (canFetch.value) {
-        shouldFetch.value = true
+        shouldFetch.value = false // 先设置为 false
+        nextTick(() => {
+          shouldFetch.value = true // 在下一个 tick 设置为 true，确保触发变化
+        })
       }
     }
 
@@ -158,7 +159,7 @@ export default {
       accountingPeriods,
       handleAccountSelect,
       canFetch,
-      fetchData,
+      fetchData, // 确保这个函数被返回
       shouldFetch,
       onFetched
     }

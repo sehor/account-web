@@ -65,13 +65,13 @@ const accountService = {
 
   async deleteAccount(id) {
     try {
-      await accountAPI.deleteAccount(id);
+      const response = await accountAPI.deleteAccount(id);
       const store = useAccountStore();
-      store.accounts = store.accounts.filter(acc => acc.id !== id);
-      return { success: true };
+      store.deleteAccount(id);
+      return response;
     } catch (error) {
-      console.error('Failed to delete account:', error);
-      return { success: false, error };
+      //console.error('删除账户失败:', error);
+      throw error; // 重新抛出错误，以便调用者可以处理它
     }
   },
 

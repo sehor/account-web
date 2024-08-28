@@ -41,6 +41,9 @@ export const useAccountStore = defineStore('accountStore', {
                 return tree;
             },
 
+            deleteAccount(id) {
+             this.accounts = this.accounts.filter(acc => acc.id !== id);
+            }
         },
         getters: {
             accountsTree(state) {

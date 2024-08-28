@@ -18,6 +18,7 @@ import HelloWorld from './components/HelloWorld.vue'
           <RouterLink to="/ledger">会计分类账</RouterLink>
           <RouterLink to="/accounts">会计科目表</RouterLink>
           <RouterLink to="/ledgers">明细账</RouterLink>
+          <RouterLink to="/voucher-query">凭证查询</RouterLink>
         </nav>
       </div>
     </header>

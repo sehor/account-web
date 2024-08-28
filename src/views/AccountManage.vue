@@ -106,10 +106,10 @@
 
 <script>
 
-import {useAccountStore} from '@/stores/accountStore';
+import { Account, AccountCategoryMapping, ChineseToEnglishMapping } from "@/models/accountModels.js";
 import accountService from '@/services/accountService';
-import {ElMessage} from 'element-plus'; // 引入 Element Plus 的 Message 组件
-import {Account, AccountCategoryMapping, ChineseToEnglishMapping} from "@/models/accountModels.js";
+import { useAccountStore } from '@/stores/accountStore';
+import { ElMessage } from 'element-plus'; // 引入 Element Plus 的 Message 组件
 
 const store = useAccountStore();
 export default {
@@ -168,7 +168,7 @@ export default {
 
       this.editedItem = { ...item };
 
-      //this.dialog = true;
+      this.dialog = true;
     },
     deleteItem(item) {
       if (item?.children?.length > 0) {
@@ -189,7 +189,6 @@ export default {
 
             if (node) {
               const parentNode = this.findNodeById(node.parentId,this.accountsTree);
-              console.log({parentNode})
               if (parentNode) {
                 parentNode.children = parentNode.children.filter(child => child.id !== this.deleteId);
               } else {

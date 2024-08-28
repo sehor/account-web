@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import VoucherQuery from '@/views/VoucherQuery.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,9 +44,17 @@ const router = createRouter({
       component: () => import('../components/Ledgers.vue')
     },
     //ledgers
-
-
-
+    {
+      path: '/voucher-query',
+      name: 'VoucherQuery',
+      component: VoucherQuery
+    },
+    // 凭证查询
+    {
+      path: '/voucher-query',
+      name: 'VoucherQuery',
+      component: () => import('../views/VoucherQuery.vue')
+    },
   ]
 })
 

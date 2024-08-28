@@ -59,7 +59,6 @@ export default {
     }
   
     function handleNodeClick(data) {
-      console.log(data)
       emit('account-selected', data) // Emit the selected account data
     }
   
