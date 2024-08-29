@@ -8,8 +8,8 @@
           <li v-for="entry in savedEntries" :key="entry.id" @click="loadEntry(entry)">
             <div class="entry-date">{{ entry.voucherDate }}</div>
             <div class="entry-description">{{ entry.voucherType }}{{ entry.voucherNumber }} {{
-                entry.entries[0].summary
-              }}
+              entry.entries[0].summary
+            }}
             </div>
             <div class="entry-amount">合计：￥{{ entry.totalAmount.toFixed(2) }}</div>
           </li>
@@ -40,7 +40,9 @@
             <div class="header-right">
               <div class="header-item">
                 日期
-                <input type="text" v-model="journalEntryView.journalEntry.modifiedDate">
+                <el-date-picker v-model="journalEntryView.journalEntry.modifiedDate" type="date" format="YYYY-MM-DD"
+                  value-format="YYYY-MM-DD" placeholder="选择日期">
+                </el-date-picker>
               </div>
               <div class="header-item">
                 附单据
@@ -49,7 +51,6 @@
               </div>
             </div>
           </div>
-          {{ journalEntryView.transactions[0] }}
           <table>
             <colgroup>
               <col class="col-summary">
@@ -66,50 +67,51 @@
               <th class="no-print">操作</th>
             </tr>
             <tbody ref="transactions">
-            <tr v-for="(transaction, index) in journalEntryView.transactions" :key="index">
-              <td :class="{ 'green-bg': index === 0 }" @click="editCell($event, transaction, 'description',index)">
-                <span>{{ transaction.description }}</span>
-                <input type="text" v-model="transaction.description" class="editable"
-                       @blur="hideInput($event, transaction, 'description')"
-                       @keydown="handleKeydown($event, transaction, 'description',index)"/>
-              </td>
+              <tr v-for="(transaction, index) in journalEntryView.transactions" :key="index">
+                <td :class="{ 'green-bg': index === 0 }" @click="editCell($event, transaction, 'description', index)">
+                  <span>{{ transaction.description }}</span>
+                  <input type="text" v-model="transaction.description" class="editable"
+                    @blur="hideInput($event, transaction, 'description')"
+                    @keydown="handleKeydown($event, transaction, 'description', index)" />
+                </td>
 
-              <td class="account" :data-index="index" @click="editCell($event, transaction, 'account',index)">
-                <el-autocomplete class="custom-autocomplete" v-model="transaction.account.fullName"
-                                 :fetch-suggestions="querySearch" placeholder="选择会计科目"
-                                 @select="(selectedAccount) => updateAccount(selectedAccount, transaction)"
-                                 @keydown="handleKeydown($event, transaction, 'account',index)"
-                />
-              </td>
+                <td class="account" :data-index="index" @click="editCell($event, transaction, 'account', index)">
+                  <el-autocomplete class="custom-autocomplete" v-model="transaction.account.fullName"
+                    :fetch-suggestions="querySearch" placeholder="选择会计科目"
+                    @select="(selectedAccount) => updateAccount(selectedAccount, transaction)"
+                    @keydown="handleKeydown($event, transaction, 'account', index)" ref="autocompleteRef" 
+                    highlight-first-item=true
+                    />
+                </td>
 
-              <td class="right-align bold-text number-cell" :data-index="index" data-field="debit"
-                  @click="editCell($event, transaction, 'debit',index)">
-                <span>{{ formatNumber(transaction.debit) }}</span>
-                <input type="text" v-model.number="transaction.debit" class="editable"
-                       @blur="hideInput($event, transaction, 'debit')"
-                       @keydown="handleKeydown($event, transaction, 'debit',index)"/>
-              </td>
-              <td class="right-align bold-text number-cell" :data-index="index" data-field="credit"
-                  @click="editCell($event, transaction, 'credit',index)"><span>{{
-                  formatNumber(transaction.credit)
-                }}</span>
-                <input type="text" v-model.number="transaction.credit" class="editable"
-                       @blur="hideInput($event, transaction, 'credit')"
-                       @keydown="handleKeydown($event, transaction, 'credit',index)"/>
-              </td>
-              <td class="action-cell no-print">
-                <span class="action-icon add" @click="addRow(index)">+</span>
-                <span class="action-icon delete" @click="deleteRow(index)">-</span>
-              </td>
-            </tr>
+                <td class="right-align bold-text number-cell" :data-index="index" data-field="debit"
+                  @click="editCell($event, transaction, 'debit', index)">
+                  <span>{{ formatNumber(transaction.debit) }}</span>
+                  <input type="text" v-model.number="transaction.debit" class="editable"
+                    @blur="hideInput($event, transaction, 'debit')"
+                    @keydown="handleKeydown($event, transaction, 'debit', index)" />
+                </td>
+                <td class="right-align bold-text number-cell" :data-index="index" data-field="credit"
+                  @click="editCell($event, transaction, 'credit', index)"><span>{{
+                    formatNumber(transaction.credit)
+                  }}</span>
+                  <input type="text" v-model.number="transaction.credit" class="editable"
+                    @blur="hideInput($event, transaction, 'credit')"
+                    @keydown="handleKeydown($event, transaction, 'credit', index)" />
+                </td>
+                <td class="action-cell no-print">
+                  <span class="action-icon add" @click="addRow(index)">+</span>
+                  <span class="action-icon delete" @click="deleteRow(index)">-</span>
+                </td>
+              </tr>
             </tbody>
             <tfoot>
-            <tr class="non-editable">
-              <td colspan="2">合计：{{ totalAmountInWords }}</td>
-              <td class="right-align bold-text number-cell">{{ formatNumber(totalDebit) }}</td>
-              <td class="right-align bold-text number-cell">{{ formatNumber(totalCredit) }}</td>
-              <td class="no-print"></td>
-            </tr>
+              <tr class="non-editable">
+                <td colspan="2">合计：{{ totalAmountInWords }}</td>
+                <td class="right-align bold-text number-cell">{{ formatNumber(totalDebit) }}</td>
+                <td class="right-align bold-text number-cell">{{ formatNumber(totalCredit) }}</td>
+                <td class="no-print"></td>
+              </tr>
             </tfoot>
           </table>
 
@@ -141,15 +143,17 @@
 </template>
 <script>
 import SearchableSelect from './SearchableSelect.vue'
-import {Transaction, JournalEntryView} from '@/models/journalEntryModels.js'
-import {journalEntryService} from '@/services/journalEntryService';
-import {ElMessage} from 'element-plus'
-import {useAccountStore} from '@/stores/accountStore';
-import {formatNumber, numberToChinese} from '@/utils.js'
+import { Transaction, JournalEntryView } from '@/models/journalEntryModels.js'
+import { journalEntryService } from '@/services/journalEntryService';
+import { ElMessage } from 'element-plus'
+import { useAccountStore } from '@/stores/accountStore';
+import { formatNumber, numberToChinese } from '@/utils.js'
+import { ElDatePicker } from 'element-plus'
 
 export default {
   components: {
-    SearchableSelect
+    SearchableSelect,
+    ElDatePicker
   },
 
   data: () => ({
@@ -323,14 +327,24 @@ export default {
       if (event.key !== 'Enter' && event.key !== 'Tab') return;
       event.preventDefault();
       const fieldsOrder = ['description', 'account', 'debit', 'credit'];
+      if (field === 'account' && event.key === 'Enter') {
+        const autocomplete = this.$refs.autocompleteRef[index];
+        if (autocomplete.highlightedIndex === -1) {
+          autocomplete.highlightedIndex = 0;
+        }
+
+        // Select the highlighted suggestion
+        const selectedAccount = autocomplete.suggestions[autocomplete.highlightedIndex];
+        this.updateAccount(selectedAccount, transaction);
+      }
 
       if (fieldsOrder.indexOf(field) < fieldsOrder.length - 1) {
         this.$refs.transactions.querySelectorAll('tr')[index].querySelectorAll('td')[fieldsOrder.indexOf(field) + 1]?.click();
       } else {
         if (index + 1 >= this.journalEntryView.transactions.length) {
-          if(event.key==='Enter'){
+          if (event.key === 'Enter') {
             this.journalEntryView.transactions.push(new Transaction());
-          }else{
+          } else {
             return;
           }
         }
@@ -361,16 +375,16 @@ export default {
 
     querySearch(queryString, cb) {
       const results = queryString
-          ? this.getLeafAccountsWithFullName
-              .filter(account => account.fullName.toLowerCase().includes(queryString.toLowerCase()))
-              .map(account => ({
-                value: account.fullName, // 保持 el-autocomplete 的正常工作
-                ...account // 保持整个 account 对象，以便后续使用
-              }))
-          : this.getLeafAccountsWithFullName.map(account => ({
-            value: account.fullName,
-            ...account
-          }));
+        ? this.getLeafAccountsWithFullName
+          .filter(account => account.fullName.toLowerCase().includes(queryString.toLowerCase()))
+          .map(account => ({
+            value: account.fullName, // 保持 el-autocomplete 的正常工作
+            ...account // 保持整个 account 对象，以便后续使用
+          }))
+        : this.getLeafAccountsWithFullName.map(account => ({
+          value: account.fullName,
+          ...account
+        }));
 
       cb(results); // 返回包含 value 和其他属性的对象数组
     },
@@ -390,6 +404,7 @@ export default {
 
 <style scoped>
 @import '@/assets/styles/journalEntry.css';
+
 /* Target the deepest element with ::v-deep */
 .custom-autocomplete {
   height: 100%;
@@ -400,4 +415,7 @@ export default {
   height: 60px;
 }
 
+.el-date-picker {
+  width: 130px;
+}
 </style>
