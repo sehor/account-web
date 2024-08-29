@@ -48,15 +48,14 @@ const accountService = {
 
     async updateAccount(accountData) {
     try {
-      await accountAPI.updateAccount(accountData);
+      const response = await accountAPI.updateAccount(accountData);
       const store = useAccountStore();
-      const index = store.accounts.findIndex(acc => acc.id === accountData.id);
+      const index = store.accounts.findIndex(acc => acc.id === response.id);
       if (index !== -1) {
-        store.accounts[index] = accountData;
-        console.log("store changed: ",accountData)
+        store.accounts[index] = response;
       }
 
-      return { success: true };
+      return response;
     } catch (error) {
       console.error('Failed to update account:', error);
       return { success: false, error };

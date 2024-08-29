@@ -10,7 +10,8 @@ export class Account {
         parentId = null,
         balanceDirection = null,
         state = null,
-        initialBalance=0
+        initialBalance = 0,
+        level = null
     ) {
         this.id = id;
         this.code = code;
@@ -21,6 +22,7 @@ export class Account {
         this.balanceDirection = balanceDirection;
         this.state = state;
         this.initialBalance = initialBalance;
+        this.level = level;
     }
 }
 

@@ -47,54 +47,48 @@
         </el-tree>
       </el-main>
 
-      <el-dialog v-model="dialog" width="500px">
-        <span slot="title">{{ formTitle }}</span>
-        <el-form :model="editedItem">
-          <el-row>
-            <el-col :span="8">
-              <el-form-item label="编码">
-                <el-input v-model="editedItem.code" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="名称">
-                <el-input v-model="editedItem.name" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="类别">
-                <el-select disabled v-model="editedItem.type">
-                  <el-option v-for="category in categories" :key="category.value" :label="category.label"
-                    :value="category.value" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="余额方向">
-                <el-select disabled v-model="editedItem.balanceDirection">
-                  <el-option v-for="direction in balanceDirections" :key="direction.value" :label="direction.label"
-                    :value="direction.value" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="状态">
-                <el-select v-model="editedItem.state">
-                  <el-option v-for="status in statusOptions" :key="status.value" :label="status.label"
-                    :value="status.value" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
+      <el-dialog v-model="dialog" width="750px">
+        <template #header>
+          <h2 style="text-align: center; margin: 0; padding: 10px 0; color: #409EFF;">{{ formTitle }}</h2>
+        </template>
+        <el-form :model="editedItem" label-width="120px">
+          <el-form-item label="编码">
+            <el-input ref="codeInput" v-model="editedItem.code" />
+          </el-form-item>
+          <el-form-item label="名称">
+            <el-input ref="nameInput" v-model="editedItem.name" />
+          </el-form-item>
+          <el-form-item label="类别">
+            <el-select disabled v-model="editedItem.type" style="width: 100%;">
+              <el-option v-for="category in categories" :key="category.value" :label="category.label"
+                :value="category.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="余额方向">
+            <el-select disabled v-model="editedItem.balanceDirection" style="width: 100%;">
+              <el-option v-for="direction in balanceDirections" :key="direction.value" :label="direction.label"
+                :value="direction.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="状态">
+            <el-select v-model="editedItem.state" style="width: 100%;">
+              <el-option v-for="status in statusOptions" :key="status.value" :label="status.label"
+                :value="status.value" />
+            </el-select>
+          </el-form-item>
         </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="close">取消</el-button>
-          <el-button type="primary" @click="save">保存</el-button>
-        </div>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="close">取消</el-button>
+            <el-button type="primary" @click="save">保存</el-button>
+          </div>
+        </template>
       </el-dialog>
 
-      <el-dialog v-model="dialogDelete" width="500px">
-        <span slot="title">确定要删除这个科目吗?</span>
+      <el-dialog v-model="dialogDelete" width="750px">
+        <template #header>
+          <span>确定要删除这个科目吗?</span>
+        </template>
         <div slot="footer" class="dialog-footer">
           <el-button @click="closeDelete">取消</el-button>
           <el-button type="danger" @click="deleteItemConfirm">确定</el-button>
@@ -110,6 +104,8 @@ import { Account, AccountCategoryMapping, ChineseToEnglishMapping } from "@/mode
 import accountService from '@/services/accountService';
 import { useAccountStore } from '@/stores/accountStore';
 import { ElMessage } from 'element-plus'; // 引入 Element Plus 的 Message 组件
+import { generateChildAccountCode, levelToLenMap } from "@/utils.js";
+import { nextTick } from 'vue';
 
 const store = useAccountStore();
 export default {
@@ -167,19 +163,23 @@ export default {
       this.isEdit = true;
 
       this.editedItem = { ...item };
-
+      
       this.dialog = true;
+      nextTick(() => {
+          this.selectNewCode();
+        });
     },
     deleteItem(item) {
       if (item?.children?.length > 0) {
         ElMessage.error({
-          message: "该科目存在下级科目，不能删除",
+          message: "该科目存在下级科目，不能除",
           duration: 5000
         });
         return
       }
       this.deleteId = item.id;
       this.dialogDelete = true;
+
     },
     deleteItemConfirm() {
       accountService.deleteAccount(this.deleteId)
@@ -202,14 +202,38 @@ export default {
 
     addSubAccount(item) {
       this.editedItem = { ...this.defaultItem };
-      this.editedItem.parentId = item.id; // Updated to use parentId
-      this.editedItem.code = this.generateNextCode(item); // Generate the next code
+      this.editedItem.parentId = item.id;
       this.editedItem.type = item.type;
       this.editedItem.balanceDirection = item.balanceDirection;
       this.editedItem.state = 'ACTIVE';
-      this.isEdit = false; // Set to false when creating a new item
-      this.dialog = true;
+      this.isEdit = false;
+
+      const siblingCodes = item.children ? item.children.map(child => child.code) : [];
+
+      try {
+        this.editedItem.code = generateChildAccountCode(item.code, item.level, siblingCodes);
+        this.dialog = true;
+        nextTick(() => {
+          this.selectNewCode();
+        });
+      } catch (error) {
+        ElMessage.error({
+          message: error.message,
+          duration: 5000
+        });
+        this.editedItem.code = '';
+      }
+
     },
+
+    selectNewCode() {
+      this.$nextTick(()=>{
+      const nameInput = this.$refs.nameInput;
+      nameInput.focus()
+    })
+     //todo
+    },
+
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -228,14 +252,17 @@ export default {
       }
       if (this.isEdit) {
         //this.updateNode(this.editedItem.id, this.editedItem);
-        accountService.updateAccount(this.editedItem).then(() => {
-          this.updateNode(this.editedItem.id, this.editedItem);
+        accountService.updateAccount(this.editedItem).then((response) => {
+          this.updateNode(response.id, response);
         })
       } else {
         accountService.addAccount(this.editedItem).then((response) => {
           const parentNode = this.findNodeById(response.parentId, this.accountsTree);
           console.log(parentNode)
           if (parentNode) {
+            if(!parentNode.children){
+              parentNode.children = []
+            }
             parentNode.children.push(response);
             this.$nextTick(() => {
               this.defaultExpandedKeys.push(parentNode.code); //展开parentnode
@@ -254,6 +281,7 @@ export default {
       return parent.code + (parent.children.length + 1).toString().padStart(3, '0');
     },
     updateNode(nodeId, newNodeData) {
+      console.log({nodeId},{newNodeData})
       const node = this.findNodeById(nodeId, this.accountsTree);
       if (node) {
         Object.assign(node, newNodeData); // This updates the node in place
